@@ -3,7 +3,7 @@ class ImageUplode
     print "enter minimum length of image:"
     @length = gets.to_i
   end
-
+#check the length of image and get number of image
   def image
     @num_img = 0
     if @length >0 && @length <10000
@@ -11,7 +11,7 @@ class ImageUplode
       @num_img = gets.to_i
     end
   end
-
+#check the number of image and get the width and height from user
   def width_height
     @width=[]
     @height=[]
@@ -22,7 +22,7 @@ class ImageUplode
       end
     end
   end
-
+#check the all condition of width and height
   def validation
     for i in 1..@num_img
       if @height[i] > 0 && @width[i] > 0 && @height[i] < 10000 && @width[i] < 10000
