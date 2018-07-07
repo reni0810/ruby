@@ -1,6 +1,13 @@
 require 'date'
-$information = { 2001 => { 01 => { 02 =>  [100,200,300] } } }
+
 class OrderAnalysis
+  def initialize
+    puts "Welcome to AppleShop"
+    puts "Today's details"
+    puts "--------"
+    @information = { 2001 => { 01 => { 02 =>  [100,200,400] } } }
+  end
+
   #For case statement
   def case_condition
     @count = 1
@@ -26,13 +33,13 @@ class OrderAnalysis
         @date = gets
         @date = Date.strptime(@date, '%d-%m-%Y')
         @flag = "true"
-        analysis_day
+        analysis
       when 3
         print "Give months details:"
         @month,@year = gets.split().map{ |str| str.to_i }
         @date = Date.new(@year, @month)
         @flag = "false"
-        analysis_month
+        analysis
       else
         print "wrong input"
       end
@@ -41,93 +48,76 @@ class OrderAnalysis
 
   #Add a new order for specific date
   def add_order
-    if $information.member?(@date.year)
-      if $information[@date.year].member?(@date.month)
-        if $information[@date.year][@date.month].member?(@date.day)
-          $information[@date.year][@date.month][@date.day].push(@amount)
+    if @amount > 0
+      if @information.member?(@date.year)
+        if @information[@date.year].member?(@date.month)
+          if @information[@date.year][@date.month].member?(@date.day)
+            @information[@date.year][@date.month][@date.day].push(@amount)
+          else
+            @information[@date.year][@date.month][@date.day] = []
+            @information[@date.year][@date.month][@date.day].push(@amount)
+          end
         else
-          $information[@date.year][@date.month][@date.day] = []
-          $information[@date.year][@date.month][@date.day].push(@amount)
+          @information[@date.year][@date.month]={}
+          @information[@date.year][@date.month][@date.day]=[]
+          @information[@date.year][@date.month][@date.day].push(@amount)
         end
       else
-        $information[@date.year][@date.month]={}
-        $information[@date.year][@date.month][@date.day]=[]
-        $information[@date.year][@date.month][@date.day].push(@amount)
+        @information[@date.year] = {}
+        @information[@date.year][@date.month] = {}
+        @information[@date.year][@date.month][@date.day]=[]
+        @information[@date.year][@date.month][@date.day].push(@amount)
       end
     else
-      $information[@date.year] = {}
-      $information[@date.year][@date.month] = {}
-      $information[@date.year][@date.month][@date.day]=[]
-      $information[@date.year][@date.month][@date.day].push(@amount)
+      puts "Negative value"
     end
   end
 
   #Display details of specific date
-  def analysis_day
-    $information.each do |year , month|
+  def analysis
+    @total_count = 0
+    @total_amount = 0
+    @min_amount = []
+    @max_amount = []
+    @minimum = 0
+    @maximum = 0
+    @information.each do |year , month|
       month.each do |months , day|
         day.each do |days , values|
-          if $information.member?(@date.year)
-            if $information[year].member?(@date.month)
-              if $information[year][months].member?(@date.day)
+          if @flag != "true" && @flag != "false"
+            @total_count = @information[year][months][days].length
+            @total_amount = @information[year][months][days].sum
+            @minimum = @information[year][months][days].min
+            @maximum = @information[year][months][days].max
+          elsif year == @date.year
+            if months == @date.month
+              if days == @date.day && @flag == "true"
                 puts
-                print "Total Order:",$information[year][months][days].length,"\n"
-                print "Total Amount:",$information[year][months][days].sum,"\n"
-                print "Minimum Order:",$information[year][months][days].min,"\n"
-                print "Maximum Order:",$information[year][months][days].max,"\n"
-                print "Average order:",$information[year][months][days].sum.to_f/$information[year][months][days].length.to_f,"\n"
+                @total_count = @information[year][months][days].length
+                @total_amount = @information[year][months][days].sum
+                @minimum = @information[year][months][days].min
+                @maximum = @information[year][months][days].max
+              elsif @flag == "false"
+                @total_count += @information[year][months][days].length
+                @total_amount += @information[year][months][days].sum
+                @min_amount.push(@information[year][months][days].min)
+                @max_amount.push(@information[year][months][days].max)
+                @minimum = @min_amount.min
+                @maximum = @max_amount.max
               end
             end
           end
         end
       end
     end
-  end
-#display details of month
-  def analysis_month
-    @total_count = 0
-    @total_amount = 0
-    @min_amount = []
-    @max_amount = []
-    $information.each do |year , month|
-      if $information.member?(@date.year)
-        month.each do |months , day|
-          if $information[year].member?(@date.month)
-            day.each do |days , values|
-              @total_count += $information[year][months][days].length
-              @total_amount += $information[year][months][days].sum
-              @min_amount.push($information[year][months][days].min)
-              @max_amount.push($information[year][months][days].max)
-            end
-            puts
-            print "Total Order:",@total_count,"\n"
-            print "Total Amount:",@total_amount,"\n"
-            print "Minimum Order:",@min_amount.min,"\n"
-            print "Maximum Order:",@max_amount.max,"\n"
-            print "Average Order:",@total_amount.to_f/@total_count.to_f,"\n"
-          end
-        end
-      end
-    end
-  end
-
-  def default
-    puts "Welcome to AppleShop"
-    puts "Today's details"
-    puts "--------"
-    $information.each do |year , month|
-      month.each do |month , day|
-        day.each do |day , values|
-          print "Total Order:",$information[year][month][day].length,"\n"
-          print "Total Amount:",$information[year][month][day].sum,"\n"
-          print "Minimum Order:",$information[year][month][day].min,"\n"
-          print "Maximum Order:",$information[year][month][day].max,"\n"
-          print "Average order:",$information[year][month][day].sum/$information[year][month][day].length,"\n"
-        end
-      end
-    end
+      puts
+      print "Total Order:",@total_count,"\n"
+      print "Total Amount:",@total_amount,"\n"
+      print "Minimum Order:",@minimum,"\n"
+      print "Maximum Order:",@maximum,"\n"
+      print "Average Order:",@total_amount.to_f/@total_count.to_f,"\n"
   end
 end
 obj = OrderAnalysis.new
-obj.default
+obj.analysis
 obj.case_condition
