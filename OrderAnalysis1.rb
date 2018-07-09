@@ -5,7 +5,6 @@ class OrderAnalysis
     puts "Welcome to AppleShop"
     puts "Today's details"
     puts "--------"
-
     @date = Date.today
     @flag = "true"
   end
@@ -51,25 +50,10 @@ class OrderAnalysis
     @date_month = @date.month.to_s.to_sym
     @date_day = @date.day.to_s.to_sym
     if @amount > 0
-      if @information.member?(@date_year)
-        if @information[@date_year].member?(@date_month)
-          if @information[@date_year][@date_month].member?(@date_day)
-            @information[@date_year][@date_month][@date_day].push(@amount)
-          else
-            @information[@date_year][@date_month][@date_day] = []
-            @information[@date_year][@date_month][@date_day].push(@amount)
-          end
-        else
-          @information[@date_year][@date_month]={}
-          @information[@date_year][@date_month][@date_day]=[]
-          @information[@date_year][@date_month][@date_day].push(@amount)
-        end
-      else
-        @information[@date_year] = {}
-        @information[@date_year][@date_month] = {}
-        @information[@date_year][@date_month][@date_day]=[]
-        @information[@date_year][@date_month][@date_day].push(@amount)
-      end
+      @information[@date_year] ={} if @information[@date_year] == nil
+      @information[@date_year][@date_month] = {} if @information[@date_year][@date_month] == nil
+      @information[@date_year][@date_month][@date_day] = [] if @information[@date_year][@date_month][@date_day] == nil
+      @information[@date_year][@date_month][@date_day].push(@amount)
     else
       puts "Negative value"
     end
@@ -87,10 +71,10 @@ class OrderAnalysis
     @minimum = 0
     @maximum = 0
     @information.each do |year , month|
-      month.each do |months , day|
-        day.each do |days , values|
-          if year == @date_year
-            if months == @date_month
+      if year == @date_year
+        month.each do |months , day|
+          if months == @date_month
+            day.each do |days , values|
               if days == @date_day && @flag == "true"
                 puts
                 @total_count = @information[year][months][days].length
@@ -110,12 +94,12 @@ class OrderAnalysis
         end
       end
     end
-      puts
-      print "Total Order:",@total_count,"\n"
-      print "Total Amount:",@total_amount,"\n"
-      print "Minimum Order:",@minimum,"\n"
-      print "Maximum Order:",@maximum,"\n"
-      print "Average Order:",'%.2f'%(@total_amount.to_f/@total_count.to_f),"\n"
+    puts
+    print "Total Order:",@total_count,"\n"
+    print "Total Amount:",@total_amount,"\n"
+    print "Minimum Order:",@minimum,"\n"
+    print "Maximum Order:",@maximum,"\n"
+    print "Average Order:",'%.2f'%(@total_amount.to_f/@total_count.to_f),"\n"
   end
 end
 obj = OrderAnalysis.new
